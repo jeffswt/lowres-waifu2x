@@ -19,6 +19,8 @@ It is generally not advised to use this program on images larger than 1000x1000 
 
 ![Comparison](./assets/img-comparison.png)
 
+This model is highly overfit to a certain type of image that holds extra low resolution. Using other images on this model would yield certain distressing artifacts.
+
 ## Installation
 
 Python 3 is required before you use this program.
