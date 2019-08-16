@@ -1,4 +1,26 @@
 
+# MIT License
+#
+# Copyright (c) 2019 Geoffrey Tang
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import math
 import numpy as np
 import os
@@ -12,10 +34,13 @@ import sys
 import threading
 import time
 
-waifu2x_loc = './waifu2x/waifu2x-caffe-cui.exe'
+__all__ = [
+    'lowres_waifu2x',
+]
 
 
 def mdotmax(a, b):
+    """mdotmax(a, b): max(a[..], b[..]) for matrices"""
     a_ = a[0] + a[1] + a[2]
     b_ = b[0] + b[1] + b[2]
     m = a_ >= b_
@@ -25,6 +50,7 @@ def mdotmax(a, b):
 
 
 def mdotmin(a, b):
+    """mdotmin(a, b): min(a[..], b[..]) for matrices"""
     a_ = a[0] + a[1] + a[2]
     b_ = b[0] + b[1] + b[2]
     m = a_ <= b_
@@ -34,18 +60,26 @@ def mdotmin(a, b):
 
 
 def mdotadd(a, b):
+    """mdotadd(a, b): a[..] + b[..] for matrices"""
     return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
 
 
 def mdotmul(a, b):
+    """mdotmul(a, b): a[..] .* b[..] for matrices"""
     return [a[0] * b, a[1] * b, a[2] * b]
 
 
 def msigmoid(x):
+    """msigmoid(x): modified sigmoid function"""
     return (1 / (1 + np.e ** (- 14.4 * (x - 0.35))) - 0.5) * 0.99 + 0.5
 
 
 def disp_progress(info, done=None, sigma=None, begin=None):
+    """disp_progress(info, *done, *sigma, *begin): display progress info
+    ...(info): display info only,
+    ...(info, True): display info and mark as done
+    ...(info, done, sigma, begin): done / sigma jobs completed, all jobs
+                                   began at time 'begin' """
     if done is None:
         print('%s... %s\r' % (info, ' ' * 20), end='')
         sys.stdout.flush()
@@ -64,7 +98,8 @@ def disp_progress(info, done=None, sigma=None, begin=None):
     return
 
 
-def lowres_waifu2x():
+def lowres_waifu2x(waifu2x_path):
+    """lowres_waifu2x(waifu2x_path): execute enhanced waifu2x"""
     do_presave = True
     do_supersample = True
     do_filter = True
@@ -121,7 +156,7 @@ def lowres_waifu2x():
 
         def worker():
             proc = subprocess.Popen(
-                args=[waifu2x_loc,
+                args=[waifu2x_path,
                       '--scale_ratio', '4',
                       '--noise_level', '2',
                       '--input_path', './waifu2x-input-dn/',
@@ -131,7 +166,7 @@ def lowres_waifu2x():
             )
             proc.wait()
             proc = subprocess.Popen(
-                args=[waifu2x_loc,
+                args=[waifu2x_path,
                       '--scale_ratio', '4',
                       '--noise_level', '0',
                       '--input_path', './waifu2x-input-or/',
@@ -248,4 +283,4 @@ def lowres_waifu2x():
 
 
 if __name__ == '__main__':
-    lowres_waifu2x()
+    lowres_waifu2x('./waifu2x/waifu2x-caffe-cui.exe')
