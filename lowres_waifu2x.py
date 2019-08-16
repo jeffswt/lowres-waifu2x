@@ -283,4 +283,12 @@ def lowres_waifu2x(waifu2x_path):
 
 
 if __name__ == '__main__':
-    lowres_waifu2x('./waifu2x/waifu2x-caffe-cui.exe')
+    waifu2x_path = './waifu2x/waifu2x-caffe-cui.exe'
+    if len(sys.argv) >= 2:
+        waifu2x_path = sys.argv[1]
+    if not os.path.exists(waifu2x_path):
+        print('lowres_waifu2x: waifu2x binary does not exist')
+        print('arguments: lowres_waifu2x path_to_waifu2x-caffe-cui')
+        print('transformation terminated.')
+        exit(1)
+    lowres_waifu2x(waifu2x_path)
