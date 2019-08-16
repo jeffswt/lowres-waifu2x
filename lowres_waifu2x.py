@@ -210,7 +210,7 @@ def lowres_waifu2x(waifu2x_path):
 
     def load_image(fn, size):
         img = PIL.Image.open(fn, mode='r')
-        img = img.resize(size)
+        img = img.resize(size).convert('RGB')
         mat = np.array(img)
         mat = mat.transpose((2, 0, 1)) * np.ones((3, size[1], size[0]))
         mat = [mat[0], mat[1], mat[2]]
@@ -278,6 +278,10 @@ def lowres_waifu2x(waifu2x_path):
                 .filter(PIL.ImageFilter.SHARPEN))
     # Save file
     orig_img.save('./output.png')
+    # Cleanup
+    for i in range(0, cnt + 1):
+        shutil.rmtree('./ssample-out-dn-%d.png' % i, ignore_errors=False)
+        shutil.rmtree('./ssample-out-or-%d.png' % i, ignore_errors=False)
     disp_progress('saving output', True)
     return
 
